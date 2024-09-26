@@ -10,14 +10,16 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-3">
+    <div class="col-lg-4">
         <div class="card">
             <div class="card-body text-center">
                 <span class="avatar avatar-xl m-3 center">
-                    @if(!uploaded_asset($member->photo))
-                        <img src="{{ static_asset('assets/img/avatar-place.png')}}">
+                    @if(uploaded_asset($member->photo) != null)
+                        <img src="{{ uploaded_asset($member->photo) }}"  alt="{{translate('photo')}}">
+                    @elseif(!empty($member->photo))
+                        <img src="{{ static_asset('').'/'.$member->photo }}"   alt="{{translate('photo')}}">
                     @else
-                        <img src="{{ uploaded_asset($member->photo) }}">
+                        <img src="{{ static_asset('assets/img/avatar-place.png') }}"  alt="{{translate('photo')}}">
                     @endif
                 </span>
                 <p>{{ $member->first_name.' '.$member->last_name }}</p>
@@ -37,9 +39,53 @@
                 </div>
             </div>
         </div>
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0 h6">{{translate('Shortlist')}}</h5><span class="text-right btn btn-light">Export</span>
+            </div>
+            <div class="card-body">
+                <table class="table table-responsive table-sm table-hover">
+                <tr>
+                    <th>{{ translate('Profile') }}</th>
+                    <th>{{ translate('Name') }}</th>
+                    <th>{{ translate('Phone') }}</th>
+                    <!-- <th>{{ translate('Email') }}</th> -->
+                    
+                </tr>
+                @foreach($shortlists as $short)
+                <tr>
+                    <td>
+                        @if(uploaded_asset($short->photo) != null)
+                            <img class="img-md" src="{{ uploaded_asset($short->photo) }}" height="45px"  alt="{{translate('photo')}}">
+                        @elseif(!empty($short->photo))
+                            <img class="img-md" src="{{ static_asset('').'/'.$short->photo }}" height="45px"  alt="{{translate('photo')}}">
+                        @else
+                            <img class="img-md" src="{{ static_asset('assets/img/avatar-place.png') }}" height="45px"  alt="{{translate('photo')}}">
+                        @endif
+                    </td>
+                    <td>
+                        <ul>
+                            <li>{{ $short->code }}</li>
+                            <li>{{ $short->first_name.' '.$short->last_name }}</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>{{ str_replace('+91','',$short->phone) }}</li>
+                            <li>{{ str_replace('+91','',$short->whatsapp_number) }}</li>
+                            <li>{{ str_replace('+91','',$short->other_number) }}</li>
+                        </ul>
+                    </td>
+                    <!-- <td>{{ $short->email }}</td> -->
+                </tr>
+                @endforeach
+              
+                </table>
+            </div>
+        </div>
     </div>
 
-    <div class="col-lg-9">
+    <div class="col-lg-8">
         <!-- Introduction -->
         <div class="card">
             <div class="card-header bg-dark text-white">

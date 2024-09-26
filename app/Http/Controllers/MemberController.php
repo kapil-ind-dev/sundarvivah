@@ -317,12 +317,11 @@ class MemberController extends Controller
                     ->orWhere('user_id', $user_id);
             })
             ->select('users.*')
-            ->get();
 
-            // ->paginate(10);
+            ->paginate(10);
             // dd($shortlists);
         $member = User::findOrFail(decrypt($id));
-        return view('admin.members.view', compact('member'));
+        return view('admin.members.view', compact('member','shortlists'));
     }
 
     /**
