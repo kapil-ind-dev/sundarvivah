@@ -17,7 +17,6 @@ class ShortlistController extends Controller
      */
     public function index()
     {
-        echo Auth::user()->id; die;
         $shortlists = User::with(['physical_attributes', 'member', 'spiritual_backgrounds', 'addresses'])
             ->join('shortlists', 'shortlists.user_id', '=', 'users.id')
             ->where('users.user_type', 'member')
