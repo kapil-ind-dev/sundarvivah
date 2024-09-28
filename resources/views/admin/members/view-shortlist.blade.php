@@ -172,6 +172,18 @@
                                     @endif
                                 </td>
                             </tr>
+                            <tr>
+                                <td class="py-1"><span>{{ translate('General Requirement') }}</span></td>
+                                <td class="py-1 fw-400" colspan="3">
+                                    {{ $user->general_requirement }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="py-1"><span>{{ translate('Prefer City') }}</span></td>
+                                <td class="py-1 fw-400" colspan="3">
+                                    {{ $user->prefer_city_name }}
+                                </td>
+                            </tr>
                         </table>
                         <div class="row gutters-5 text-center">
                             <div class="col">

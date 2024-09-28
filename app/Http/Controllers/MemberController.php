@@ -68,7 +68,7 @@ class MemberController extends Controller
         $this->middleware(['permission:show_unapproved_profile_picrures'])->only('unapproved_profile_pictures');
         $this->middleware(['permission:approve_profile_picrures'])->only('approve_profile_image');
         $this->middleware(['permission:approve_member'])->only('show_verification_info');
-        
+
 
         $this->rules = [
             'first_name'        => ['required', 'max:255'],
@@ -118,7 +118,7 @@ class MemberController extends Controller
             ->where(function ($query) {
                 $query->where('deactivated', 0);
             });
-    
+
         // Check if there is a search term
         if ($request->has('search')) {
             $sort_search = $request->search;
@@ -128,10 +128,10 @@ class MemberController extends Controller
                     ->orWhere('last_name', 'like', '%' . $sort_search . '%');
             });
         }
-    
+
         // Paginate the results
         $members = $members->paginate(10);
-    
+
         // Return the view with the results and search term
         return view('admin.members.index', compact('members', 'sort_search'));
     }
@@ -152,7 +152,7 @@ class MemberController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    
+
     public function store(Request $request)
     {
         $rules = $this->rules;
@@ -183,7 +183,7 @@ class MemberController extends Controller
             $photo = time().'.'.$request->photo->extension();
             $request->photo->move(public_path('uploads/all'), $photo);
             $photo_name = 'uploads/all/'.$photo;
-            
+
         }else{
             $photo_name = $request->input('old_photo');
         }
@@ -243,7 +243,7 @@ class MemberController extends Controller
     }
 
     public function verification_form ()
-    {   
+    {
         $user = auth()->user();
         if ($user->verification_info == null) {
             return view('frontend.member.member_verifiction_form', compact('user'));
@@ -302,6 +302,7 @@ class MemberController extends Controller
         // echo $user_id; die;
        $shortlists = User::with(['physical_attributes', 'member', 'spiritual_backgrounds', 'addresses'])
             ->join('shortlists', 'shortlists.user_id', '=', 'users.id')
+            ->leftJoin('partner_expectations', 'partner_expectations.user_id', '=', 'users.id')
             ->where('users.user_type', 'member')
             ->where('shortlists.shortlisted_by', $user_id)
             ->whereNotIn('users.id', function ($query) use ($user_id) {
@@ -316,7 +317,7 @@ class MemberController extends Controller
                     ->where('ignored_by', $user_id)
                     ->orWhere('user_id', $user_id);
             })
-            ->select('users.*')
+            ->select('users.*','partner_expectations.prefer_city as prefer_city_name','partner_expectations.general as general_requirement')
 
             ->paginate(10);
             // dd($shortlists);
@@ -365,28 +366,28 @@ class MemberController extends Controller
         flash('Sorry! Something went wrong.')->error();
         return back();
     }
-    
+
     public function heighest_eduction_update(Request $request, $id)
     {
         $member = Member::where('user_id', $id)->first();
         $member->heighest_education = $request->heighest_education;
         $member->education_details = $request->education_details;
         if ($member->save()) {
-            
+
             flash('Member education info has been updated successfully')->success();
             return back();
         }
         flash('Sorry! Something went wrong.')->error();
         return back();
     }
-    
+
     public function emplyeed_profession_update(Request $request, $id)
     {
         $member = Member::where('user_id', $id)->first();
         $member->employed_in = $request->employed_in;
         $member->profession = $request->profession;
         if ($member->save()) {
-            
+
             flash('Member career info has been updated successfully')->success();
             return back();
         }
@@ -396,7 +397,7 @@ class MemberController extends Controller
 
     public function basic_info_update(Request $request, $id)
     {
-        
+
         $this->rules = [
             'first_name'    => ['required', 'max:255'],
             'last_name'     => ['required', 'max:255'],
@@ -424,11 +425,11 @@ class MemberController extends Controller
             $photo = time().'.'.$request->photo->extension();
             $request->photo->move(public_path('uploads/all'), $photo);
             $photo_name = 'uploads/all/'.$photo;
-            
+
         }else{
             $photo_name = $request->input('old_photo');
         }
-        
+
     // dd($request->all());
         if ($validator->fails()) {
             flash(translate('Something went wrong'))->error();
@@ -497,7 +498,7 @@ class MemberController extends Controller
         if ($user->save()) {
 
             $status = 'Approved';
-            
+
             // Member verification email send to members
             if ($user->email != null && get_email_template('member_verification_email', 'status')) {
                 EmailUtility::member_verification_email($user, $status);
@@ -510,14 +511,14 @@ class MemberController extends Controller
             return back();
         }
     }
-    
+
     public function reject_verification($id)
     {
         $user             = User::findOrFail($id);
         $user->verification_info   = null;
         if ($user->save()) {
             $status = 'Rejected';
-            
+
             // Member verification email send to members
             if ($user->email != null && get_email_template('member_verification_email', 'status')) {
                 EmailUtility::member_verification_email($user, $status);
@@ -536,7 +537,7 @@ class MemberController extends Controller
     {
         $sort_search        = null;
         $deleted_members    = User::onlyTrashed();
-       
+
         if ($request->has('search')) {
             $sort_search  = $request->search;
             $deleted_members  = $deleted_members->where(function ($query) use ($sort_search){
@@ -568,7 +569,7 @@ class MemberController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
-    {   
+    {
         $user = User::findOrFail($id);
 
         $user->member()->delete();
@@ -586,13 +587,13 @@ class MemberController extends Controller
         $user->spiritual_backgrounds()->delete();
         $user->happy_story()->delete();
         $user->uploads()->delete();
-        
+
         $chatThreads = ChatThread::where('sender_user_id', $user->id)->orWhere('receiver_user_id', $user->id)->get();
         foreach($chatThreads as $chatThread){
-            $chatThread->chats()->delete(); 
+            $chatThread->chats()->delete();
         }
         foreach($chatThreads as $chatThread){
-            $chatThread->delete(); 
+            $chatThread->delete();
         }
 
         if (User::destroy($id)) {
@@ -621,13 +622,13 @@ class MemberController extends Controller
         $user->spiritual_backgrounds()->withTrashed()->restore();
         $user->happy_story()->withTrashed()->restore();
         $user->uploads()->withTrashed()->restore();
-        
+
         $chatThreads = ChatThread::withTrashed()->where('sender_user_id', $user->id)->orWhere('receiver_user_id', $user->id)->get();
         foreach($chatThreads as $chatThread){
-            $chatThread->chats()->withTrashed()->restore(); 
+            $chatThread->chats()->withTrashed()->restore();
         }
         foreach($chatThreads as $chatThread){
-            $chatThread->restore(); 
+            $chatThread->restore();
         }
 
         if (User::withTrashed()->where('id', $id)->restore()) {
@@ -673,16 +674,16 @@ class MemberController extends Controller
         ReportedUser::where('user_id', $user->id)->orWhere('reported_by',$user->id)->delete();
         ExpressInterest::where('user_id', $user->id)->orWhere('interested_by',$user->id)->delete();
         ProfileMatch::where('user_id', $user->id)->orWhere('match_id',$user->id)->delete();
-        
+
         $chatThreads = ChatThread::withTrashed()->where('sender_user_id', $user->id)->orWhere('receiver_user_id', $user->id)->get();
         foreach($chatThreads as $chatThread){
-            $chatThread->chats()->withTrashed()->forcedelete(); 
+            $chatThread->chats()->withTrashed()->forcedelete();
         }
 
         foreach($chatThreads as $chatThread){
-            $chatThread->forcedelete(); 
+            $chatThread->forcedelete();
         }
-        
+
         $user->member()->withTrashed()->forcedelete();
         $user->forcedelete();
 
@@ -816,7 +817,7 @@ class MemberController extends Controller
         $marital_statuses   = MaritalStatus::all();
         $on_behalves        = OnBehalf::all();
         $languages          = MemberLanguage::all();
-        // dd('hello'); 
+        // dd('hello');
 
         return view('frontend.member.profile.index', compact('member','highest_education','employed_in','profession', 'countries', 'religions', 'castes', 'family_values', 'marital_statuses', 'on_behalves', 'languages'));
     }
@@ -919,11 +920,11 @@ class MemberController extends Controller
         flash(translate('Something Went Wrong!'))->error();
         return back();
     }
-    
+
     public function total_members(Request $request)
     {
         $sort_search = null;
-    
+
         // Start building the query
         $members = User::select(
             'users.id', // Selecting necessary columns
@@ -952,7 +953,7 @@ class MemberController extends Controller
         ->where(function ($query) {
             $query->where('users.deactivated', 0);
         });
-    
+
         // Apply search filter
         if ($request->has('search')) {
             $sort_search = $request->search;
@@ -962,10 +963,10 @@ class MemberController extends Controller
                       ->orWhere('users.last_name', 'like', '%' . $sort_search . '%');
             });
         }
-    
+
         // Apply ordering and pagination
         $members = $members->orderBy('users.id', 'desc')->distinct()->paginate(10);
-        
+
         // Return the view with members and search term
         return view('admin.members.total-members', compact('members', 'sort_search'));
     }
