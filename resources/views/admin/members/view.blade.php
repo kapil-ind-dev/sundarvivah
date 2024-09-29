@@ -211,4 +211,69 @@
      }
 
 </script>
+  <script>
+     // Shortlist
+        function do_shortlist(id) {
+            var shortlisted_by = '';
+            <?php if(isset($user_id)){ ?>
+                var shortlisted_by = '{{ $user_id }}';
+            <?php } ?>
+            // alert(shortlisted_by);
+            if(shortlisted_by != ''){
+            $("#shortlist_a_id_" + id).removeAttr("onclick");
+            $("#shortlist_id_" + id).html("{{ translate('Shortlisting') }}..");
+            $.post('{{ route('add-to-shortlist') }}', {
+                    _token: '{{ csrf_token() }}',
+                    user_id: id,
+                    shortlisted_by: shortlisted_by,
+                },
+                function(data) {
+                    if (data == 1) {
+                        $("#shortlist_id_" + id).html("{{ translate('Shortlisted') }}");
+                        $("#shortlist_id_" + id).attr("class", "d-block fs-10 opacity-60 text-primary");
+                        $("#shortlist_a_id_" + id).attr("onclick", "remove_shortlist(" + id + ")");
+                        AIZ.plugins.notify('success', '{{ translate('You Have Shortlisted This Member.') }}');
+                    } else {
+                        $("#shortlist_id_" + id).html("{{ translate('Shortlist') }}");
+                        AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
+                    }
+                }
+            );
+            }else{
+                alert('please select a member first!');
+            }
+        }
+
+        function remove_shortlist(id) {
+             var shortlisted_by = '';
+            <?php if(isset($user_id)){ ?>
+                var shortlisted_by = '{{ $user_id }}';
+            <?php } ?>
+            // alert(shortlisted_by);
+            if(shortlisted_by != ''){
+            $("#shortlist_a_id_" + id).removeAttr("onclick");
+            $("#shortlist_id_" + id).html("{{ translate('Removing') }}..");
+            $.post('{{ route('remove-from-shortlist') }}', {
+                    _token: '{{ csrf_token() }}',
+                    user_id: id,
+                    shortlisted_by: shortlisted_by,
+                },
+                function(data) {
+                    if (data == 1) {
+                        $("#shortlist_id_" + id).html("{{ translate('Shortlist') }}");
+                        $("#shortlist_id_" + id).attr("class", "d-block fs-10 opacity-60 text-dark");
+                        $("#shortlist_a_id_" + id).attr("onclick", "do_shortlist(" + id + ")");
+                        AIZ.plugins.notify('success',
+                            '{{ translate('You Have Removed This Member From Your Shortlist.') }}');
+                    } else {
+                        AIZ.plugins.notify('danger', '{{ translate('Something went wrong') }}');
+                    }
+                }
+            );
+            }else{
+                alert('please select a member first!');
+            }
+        }
+
+        </script>
 @endsection

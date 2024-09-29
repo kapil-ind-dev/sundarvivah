@@ -322,7 +322,7 @@ class MemberController extends Controller
             ->paginate(10);
             // dd($shortlists);
         $member = User::findOrFail(decrypt($id));
-        return view('admin.members.view', compact('member','shortlists'));
+        return view('admin.members.view', compact('member','shortlists','user_id'));
     }
 
     /**

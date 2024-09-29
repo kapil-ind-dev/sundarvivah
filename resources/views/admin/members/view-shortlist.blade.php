@@ -1,3 +1,9 @@
+@php
+$userid = '';
+if(isset($user_id)){
+    $userid = $user_id;
+}
+@endphp
 <div class="card-body">
     <div class="mb-5">
         @foreach ($shortlists as $key => $user)
@@ -198,11 +204,12 @@
                             </div>
                             <div class="col">
                                 @php
+
                                     $interest_class = 'text-primary';
                                     $do_expressed_interest = \App\Models\ExpressInterest::where('user_id', $user->id)
-                                        ->where('interested_by', Auth::user()->id)
+                                        ->where('interested_by', $userid)
                                         ->first();
-                                    $received_expressed_interest = \App\Models\ExpressInterest::where('user_id', Auth::user()->id)
+                                    $received_expressed_interest = \App\Models\ExpressInterest::where('user_id', $userid)
                                         ->where('interested_by', $user->id)
                                         ->first();
                                     if (empty($do_expressed_interest) && empty($received_expressed_interest)) {
@@ -232,11 +239,8 @@
                             </div>
                             <div class="col">
                                 @php
-                                    $shortlist = \App\Models\Shortlist::where(
-                                        'user_id',
-                                        $user->id,
-                                    )
-                                        ->where('shortlisted_by', Auth::user()->id)
+                                    $shortlist = \App\Models\Shortlist::where('user_id', $user->id)
+                                        ->where('shortlisted_by', $userid)
                                         ->first();
                                     if (empty($shortlist)) {
                                         $shortlist_onclick = 1;
@@ -249,13 +253,15 @@
                                     }
                                 @endphp
                                 <a id="shortlist_a_id_{{ $user->id }}"
-                                    @if ($shortlist_onclick == 1) onclick="do_shortlist({{ $user->id }})"
-                            @else
-                                onclick="remove_shortlist({{ $user->id }})" @endif
+                                    @if ($shortlist_onclick == 1)
+                                        onclick="do_shortlist({{ $user->id }})"
+                                    @else
+                                        onclick="remove_shortlist({{ $user->id }})"
+                                    @endif
                                     class="text-reset c-pointer">
                                     <i class="las la-list fs-20 text-primary"></i>
                                     <span id="shortlist_id_{{ $user->id }}"
-                                        class="d-block fs-10 opacity-60 {{ $shortlist_class }} ">
+                                        class="d-block fs-10 opacity-60 {{ $shortlist_class }}">
                                         {{ $shortlist_text }}
                                     </span>
                                 </a>
@@ -276,7 +282,7 @@
                                         'user_id',
                                         $user->id,
                                     )
-                                        ->where('reported_by', Auth::user()->id)
+                                        ->where('reported_by', $userid)
                                         ->first();
                                     if (empty($profile_reported)) {
                                         $report_onclick = 1;
