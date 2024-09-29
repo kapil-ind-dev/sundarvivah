@@ -75,7 +75,7 @@ class RegisterController extends Controller
             'last_name'            => ['required', 'string', 'max:255'],
             'gender'               => 'required',
             'date_of_birth'        => 'required|date',
-            'phone'                 => 'required_without:email|nullable|string|unique:users',
+            'phone'                 => 'required_without:email|nullable|string',
             'email'                 => 'required_without:phone|nullable|email|unique:users',
             'password'             => ['required', 'string', 'min:8', 'confirmed'],
             'g-recaptcha-response' => [
@@ -87,7 +87,7 @@ class RegisterController extends Controller
             'on_behalf.required' => translate('on_behalf is required'),
             'on_behalf.integer' => translate('on_behalf should be integer value'),
             'first_name.required' => translate('first_name is required'),
-            'last_name.required' => translate('last_name is required'),
+            'last_name.required' => translate('Last Name is required'),
             'gender.required' => translate('gender is required'),
             'date_of_birth.required' => translate('date_of_birth is required'),
             'date_of_birth.date' => translate('date_of_birth should be in date format'),
@@ -156,8 +156,8 @@ class RegisterController extends Controller
 
         $member                             = new Member;
         $member->user_id                    = $user->id;
-       
-    
+
+
         $member->gender                     = $data['gender'];
         $member->marital_status_id          = $data['marital_status'];
         $member->save();
@@ -189,6 +189,7 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
+        // dd($request->all());
         // if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {
         //     if (User::where('email', $request->email)->first() != null) {
         //         flash(translate('Email or Phone already exists.'));
@@ -215,7 +216,7 @@ class RegisterController extends Controller
             $message = translate('A new member has been registered to your system. Name: ') . $user->first_name . ' ' . $user->last_name;
             $route = route('members.index', $user->membership);
 
-            // fcm 
+            // fcm
             if (get_setting('firebase_push_notification') == 1) {
                 $fcmTokens = User::where('user_type', 'admin')->whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
                 Larafirebase::withTitle($notify_type)
@@ -262,16 +263,16 @@ class RegisterController extends Controller
 
 
 
-// from s 
+// from s
 
 // function records() {
-    
+
 //     return $records = user::all();
-    
+
 //     return view('member-profile' ,compact('$records'));
-    
-    
-    
+
+
+
 // }
 
 

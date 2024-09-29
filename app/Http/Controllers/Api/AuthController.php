@@ -268,12 +268,12 @@ class AuthController extends Controller
             if ($request->send_code_by == 'phone') {
                 $otpController = new OTPVerificationController();
                 $otpController->send_code($user);
-            } 
+            }
             else {
                 try {
                     $user->notify(new AppEmailVerificationNotification($user));
                 }
-                catch (\Exception $e) 
+                catch (\Exception $e)
                 {
                     return response()->json
                     (
@@ -284,7 +284,7 @@ class AuthController extends Controller
                         404,
                     );
                 }
-                
+
             }
         } else {
             return response()->json(

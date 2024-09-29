@@ -1,0 +1,895 @@
+warning: in the working copy of 'resources/views/frontend/index.blade.php', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/app/Http/Controllers/Api/AuthController.php b/app/Http/Controllers/Api/AuthController.php[m
+[1mindex 9db73b5..f9691b7 100644[m
+[1m--- a/app/Http/Controllers/Api/AuthController.php[m
+[1m+++ b/app/Http/Controllers/Api/AuthController.php[m
+[36m@@ -268,12 +268,12 @@[m [mclass AuthController extends Controller[m
+             if ($request->send_code_by == 'phone') {[m
+                 $otpController = new OTPVerificationController();[m
+                 $otpController->send_code($user);[m
+[31m-            } [m
+[32m+[m[32m            }[m
+             else {[m
+                 try {[m
+                     $user->notify(new AppEmailVerificationNotification($user));[m
+                 }[m
+[31m-                catch (\Exception $e) [m
+[32m+[m[32m                catch (\Exception $e)[m
+                 {[m
+                     return response()->json[m
+                     ([m
+[36m@@ -284,7 +284,7 @@[m [mclass AuthController extends Controller[m
+                         404,[m
+                     );[m
+                 }[m
+[31m-                [m
+[32m+[m
+             }[m
+         } else {[m
+             return response()->json([m
+[1mdiff --git a/app/Http/Controllers/Auth/RegisterController.php b/app/Http/Controllers/Auth/RegisterController.php[m
+[1mindex edcdb82..3e025a4 100644[m
+[1m--- a/app/Http/Controllers/Auth/RegisterController.php[m
+[1m+++ b/app/Http/Controllers/Auth/RegisterController.php[m
+[36m@@ -75,7 +75,7 @@[m [mclass RegisterController extends Controller[m
+             'last_name'            => ['required', 'string', 'max:255'],[m
+             'gender'               => 'required',[m
+             'date_of_birth'        => 'required|date',[m
+[31m-            'phone'                 => 'required_without:email|nullable|string|unique:users',[m
+[32m+[m[32m            'phone'                 => 'required_without:email|nullable|string',[m
+             'email'                 => 'required_without:phone|nullable|email|unique:users',[m
+             'password'             => ['required', 'string', 'min:8', 'confirmed'],[m
+             'g-recaptcha-response' => [[m
+[36m@@ -87,7 +87,7 @@[m [mclass RegisterController extends Controller[m
+             'on_behalf.required' => translate('on_behalf is required'),[m
+             'on_behalf.integer' => translate('on_behalf should be integer value'),[m
+             'first_name.required' => translate('first_name is required'),[m
+[31m-            'last_name.required' => translate('last_name is required'),[m
+[32m+[m[32m            'last_name.required' => translate('Last Name is required'),[m
+             'gender.required' => translate('gender is required'),[m
+             'date_of_birth.required' => translate('date_of_birth is required'),[m
+             'date_of_birth.date' => translate('date_of_birth should be in date format'),[m
+[36m@@ -156,8 +156,8 @@[m [mclass RegisterController extends Controller[m
+ [m
+         $member                             = new Member;[m
+         $member->user_id                    = $user->id;[m
+[31m-       [m
+[31m-    [m
+[32m+[m
+[32m+[m
+         $member->gender                     = $data['gender'];[m
+         $member->marital_status_id          = $data['marital_status'];[m
+         $member->save();[m
+[36m@@ -189,6 +189,7 @@[m [mclass RegisterController extends Controller[m
+ [m
+     public function register(Request $request)[m
+     {[m
+[32m+[m[32m        // dd($request->all());[m
+         // if (filter_var($request->email, FILTER_VALIDATE_EMAIL)) {[m
+         //     if (User::where('email', $request->email)->first() != null) {[m
+         //         flash(translate('Email or Phone already exists.'));[m
+[36m@@ -215,7 +216,7 @@[m [mclass RegisterController extends Controller[m
+             $message = translate('A new member has been registered to your system. Name: ') . $user->first_name . ' ' . $user->last_name;[m
+             $route = route('members.index', $user->membership);[m
+ [m
+[31m-            // fcm [m
+[32m+[m[32m            // fcm[m
+             if (get_setting('firebase_push_notification') == 1) {[m
+                 $fcmTokens = User::where('user_type', 'admin')->whereNotNull('fcm_token')->pluck('fcm_token')->toArray();[m
+                 Larafirebase::withTitle($notify_type)[m
+[36m@@ -262,16 +263,16 @@[m [mclass RegisterController extends Controller[m
+ [m
+ [m
+ [m
+[31m-// from s [m
+[32m+[m[32m// from s[m
+ [m
+ // function records() {[m
+[31m-    [m
+[32m+[m
+ //     return $records = user::all();[m
+[31m-    [m
+[32m+[m
+ //     return view('member-profile' ,compact('$records'));[m
+[31m-    [m
+[31m-    [m
+[31m-    [m
+[32m+[m
+[32m+[m
+[32m+[m
+ // }[m
+ [m
+ [m
+[1mdiff --git a/resources/views/frontend/index.blade.php b/resources/views/frontend/index.blade.php[m
+[1mindex beeae5e..e0aaae8 100644[m
+[1m--- a/resources/views/frontend/index.blade.php[m
+[1m+++ b/resources/views/frontend/index.blade.php[m
+[36m@@ -67,705 +67,7 @@[m
+                     </div>[m
+ [m
+                     @if (!Auth::check() && get_setting('show_homepage_slider_registration') == 'on')[m
+[31m-[m
+[31m-                        <div class="offset-xxl-2 offset-xl-1 col-lg-6 col-xxl-5">[m
+[31m-[m
+[31m-                            <div class="card">[m
+[31m-[m
+[31m-                                <div class="card-body">[m
+[31m-[m
+[31m-                                    <div class="mb-4 text-center">[m
+[31m-[m
+[31m-                                        <!-- <h2 class="h3 text-primary mb-0">{{ translate('Create Your Account') }}</h2> -->[m
+[31m-                                        <h4 class="h3 text-primary mb-0">{{ translate('100% Free Registration -Create a Marriage Profile') }}</h4>[m
+[31m-[m
+[31m-                                        <p>{{ translate('Fill out the form to get started') }}.</p>[m
+[31m-[m
+[31m-                                    </div>[m
+[31m-[m
+[31m-                                    <form class="form-default" id="reg-form" role="form"[m
+[31m-[m
+[31m-                                        action="{{ route('register') }}" method="POST">[m
+[31m-[m
+[31m-                                        @csrf[m
+[31m-[m
+[31m-                                        <div class="row">[m
+[31m-[m
+[31m-                                            <div class="col-lg-12">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="on_behalf">{{ translate('Name of Person') }}</label>[m
+[31m-[m
+[31m-                                                    @php $on_behalves = \App\Models\OnBehalf::all(); @endphp[m
+[31m-[m
+[31m-                                                    <select[m
+[31m-[m
+[31m-                                                        class="form-control aiz-selectpicker @error('on_behalf') is-invalid @enderror"[m
+[31m-[m
+[31m-                                                        name="on_behalf" required>[m
+[31m-[m
+[31m-                                                        @foreach ($on_behalves as $on_behalf)[m
+[31m-[m
+[31m-                                                            <option value="{{ $on_behalf->id }}">{{ $on_behalf->name }}[m
+[31m-[m
+[31m-                                                            </option>[m
+[31m-[m
+[31m-                                                        @endforeach[m
+[31m-[m
+[31m-                                                    </select>[m
+[31m-[m
+[31m-                                                    @error('on_behalf')[m
+[31m-[m
+[31m-                                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                    @enderror[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-                                        <div class="row">[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="name">{{ translate('Groom/Bride name') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="text"[m
+[31m-[m
+[31m-                                                        class="form-control @error('first_name') is-invalid @enderror"[m
+[31m-[m
+[31m-                                                        name="first_name" id="first_name"[m
+[31m-[m
+[31m-                                                        placeholder="{{ translate('First Name') }}" required>[m
+[31m-[m
+[31m-                                                    @error('first_name')[m
+[31m-[m
+[31m-                                                        <span class="invalid-feedback"[m
+[31m-[m
+[31m-                                                            role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                    @enderror[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="name">{{ translate('Surname') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="text"[m
+[31m-[m
+[31m-                                                        class="form-control @error('last_name') is-invalid @enderror"[m
+[31m-[m
+[31m-                                                        name="last_name" id="last_name"[m
+[31m-[m
+[31m-                                                        placeholder="{{ translate('Last Name') }}" required>[m
+[31m-[m
+[31m-                                                    @error('last_name')[m
+[31m-[m
+[31m-                                                        <span class="invalid-feedback"[m
+[31m-[m
+[31m-                                                            role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                    @enderror[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-                                        <div class="row">[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="gender">{{ translate('Gender') }}</label>[m
+[31m-[m
+[31m-                                                    <select[m
+[31m-[m
+[31m-                                                        class="form-control aiz-selectpicker @error('gender') is-invalid @enderror"[m
+[31m-[m
+[31m-                                                        name="gender" required>[m
+[31m-[m
+[31m-                                                        <option value="1">{{ translate('Male') }}</option>[m
+[31m-[m
+[31m-                                                        <option value="2">{{ translate('Female') }}</option>[m
+[31m-[m
+[31m-                                                    </select>[m
+[31m-[m
+[31m-                                                    @error('gender')[m
+[31m-[m
+[31m-                                                        <span class="invalid-feedback"[m
+[31m-[m
+[31m-                                                            role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                    @enderror[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                            <div class="col-md-6">[m
+[31m-[m
+[31m-                                                <label for="first_name">{{ translate('Marital  Status') }}[m
+[31m-[m
+[31m-                                                    <span class="text-danger">*</span>[m
+[31m-[m
+[31m-                                                </label>[m
+[31m-[m
+[31m-                                                <select class="form-control aiz-selectpicker" id="marital_status"[m
+[31m-[m
+[31m-                                                    name="marital_status" data-live-search="true" required>[m
+[31m-[m
+[31m-                                                    @foreach ($marital_statuses as $marital_status)[m
+[31m-[m
+[31m-                                                        <option value="{{ $marital_status->id }}">[m
+[31m-[m
+[31m-                                                            {{ $marital_status->name }}</option>[m
+[31m-[m
+[31m-                                                    @endforeach[m
+[31m-[m
+[31m-                                                </select>[m
+[31m-[m
+[31m-                                                @error('marital_status')[m
+[31m-[m
+[31m-                                                    <small class="form-text text-danger">{{ $message }}</small>[m
+[31m-[m
+[31m-                                                @enderror[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                        <div class="row">[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="date_of_birth">{{ translate('Date Of Birth') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="date"[m
+[31m-[m
+[31m-                                                        class="form-control aiz-date-range @error('date_of_birth') is-invalid @enderror"[m
+[31m-[m
+[31m-                                                        name="date_of_birth" id="date_of_birth"[m
+[31m-[m
+[31m-                                                        placeholder="{{ translate('Date Of Birth') }}" data-single="true"[m
+[31m-[m
+[31m-                                                        data-show-dropdown="true" data-max-date="{{ get_max_date() }}"[m
+[31m-[m
+[31m-                                                        autocomplete="off" required>[m
+[31m-[m
+[31m-                                                    @error('date_of_birth')[m
+[31m-[m
+[31m-                                                        <span class="invalid-feedback"[m
+[31m-[m
+[31m-                                                            role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                    @enderror[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="education">{{ translate('Education') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="text" class="form-control" name="education"[m
+[31m-[m
+[31m-                                                        id="education" placeholder="{{ translate(' Enter Education') }}"[m
+[31m-[m
+[31m-                                                        required>[m
+[31m-[m
+[31m-                                                    <!--@error('first_name')[m
+[31m-[m
+[31m-        -->[m
+[31m-[m
+[31m-                                                        <!--	<span class="invalid-feedback" role="alert">{{ $message }}</span>-->[m
+[31m-[m
+[31m-                                                        <!--[m
+[31m-[m
+[31m-    @enderror-->[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                        <div class="row">[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="profession">{{ translate('Profession') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="text" class="form-control " name="profession"[m
+[31m-[m
+[31m-                                                        id="profession" placeholder="{{ translate('Enter Profession') }}"[m
+[31m-[m
+[31m-                                                        required>[m
+[31m-[m
+[31m-                                                    <!--@error('last_name')[m
+[31m-[m
+[31m-        -->[m
+[31m-[m
+[31m-                                                        <!--<span class="invalid-feedback" role="alert">{{ $message }}</span>-->[m
+[31m-[m
+[31m-                                                        <!--[m
+[31m-[m
+[31m-    @enderror-->[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="live_city">{{ translate('Live in city') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="text" class="form-control" name="live_city"[m
+[31m-[m
+[31m-                                                        id="live_city" placeholder="{{ translate('Enter Your City') }}"[m
+[31m-[m
+[31m-                                                        required>[m
+[31m-[m
+[31m-                                                    <!--@error('last_name')[m
+[31m-[m
+[31m-        -->[m
+[31m-[m
+[31m-                                                        <!--<span class="invalid-feedback" role="alert">{{ $message }}</span>-->[m
+[31m-[m
+[31m-                                                        <!--[m
+[31m-[m
+[31m-    @enderror-->[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                        <!-- @if (addon_activation('otp_system')) -->[m
+[31m-[m
+[31m-                                            <div>[m
+[31m-[m
+[31m-                                                <div class="d-flex justify-content-between align-items-start">[m
+[31m-[m
+[31m-                                                    <!-- <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="email">{{ translate('Email / Phone') }}</label> -->[m
+[31m-[m
+[31m-                                                    <!-- <button class="btn btn-link p-0 opacity-50 text-reset fs-12"[m
+[31m-[m
+[31m-                                                        type="button"[m
+[31m-[m
+[31m-                                                        onclick="toggleEmailPhone(this)">{{ translate('Use Email Instead') }}</button> -->[m
+[31m-                                                        <label class="form-label"[m
+[31m-[m
+[31m-                                                           for="email">{{ translate('Phone') }}</label>[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                                <div class="form-group phone-form-group mb-1">[m
+[31m-[m
+[31m-                                                    <input type="tel" id="phone-code"[m
+[31m-[m
+[31m-                                                        class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}"[m
+[31m-[m
+[31m-                                                        value="{{ old('phone') }}" placeholder="" name="phone"[m
+[31m-[m
+[31m-                                                        autocomplete="off">[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                                <input type="hidden" name="country_code" value="">[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                                <div class="form-group email-form-group mb-1">[m
+[31m-                                                <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="email">{{ translate('Email') }}</label>[m
+[31m-                                                    <input type="email"[m
+[31m-[m
+[31m-                                                        class="form-control {{ $errors->has('email') ? ' is-invalid' : '' }}"[m
+[31m-[m
+[31m-                                                        value="{{ old('email') }}"[m
+[31m-[m
+[31m-                                                        placeholder="{{ translate('Email') }}" name="email"[m
+[31m-[m
+[31m-                                                        autocomplete="off">[m
+[31m-[m
+[31m-                                                    @if ($errors->has('email'))[m
+[31m-[m
+[31m-                                                        <span class="invalid-feedback" role="alert">[m
+[31m-[m
+[31m-                                                            <strong>{{ $errors->first('email') }}</strong>[m
+[31m-[m
+[31m-                                                        </span>[m
+[31m-[m
+[31m-                                                    @endif[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        <!-- @else -->[m
+[31m-[m
+[31m-                                            <div class="row">[m
+[31m-[m
+[31m-                                                <div class="col-lg-12">[m
+[31m-[m
+[31m-                                                    <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                        <label class="form-label"[m
+[31m-[m
+[31m-                                                            for="email">{{ translate('Email address') }}</label>[m
+[31m-[m
+[31m-                                                        <input type="email"[m
+[31m-[m
+[31m-                                                            class="form-control @error('email') is-invalid @enderror"[m
+[31m-[m
+[31m-                                                            name="email" id="signinSrEmail"[m
+[31m-[m
+[31m-                                                            placeholder="{{ translate('Email Address') }}">[m
+[31m-[m
+[31m-                                                        @error('email')[m
+[31m-[m
+[31m-                                                            <span class="invalid-feedback"[m
+[31m-[m
+[31m-                                                                role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                        @enderror[m
+[31m-[m
+[31m-                                                    </div>[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                            <div class="d-flex justify-content-between align-items-start">[m
+[31m-[m
+[31m-                                                <label class="form-label" for="email">{{ translate('Phone') }}</label>[m
+[31m-[m
+[31m-                                                <button class="btn btn-link p-0 opacity-50 text-reset fs-12"[m
+[31m-[m
+[31m-                                                    type="button"[m
+[31m-[m
+[31m-                                                    onclick="toggleEmailPhone(this)">{{ translate('') }}</button>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                            <div class="form-group phone-form-group mb-1">[m
+[31m-[m
+[31m-                                                <input type="tel"[m
+[31m-[m
+[31m-                                                    class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}"[m
+[31m-[m
+[31m-                                                    value="{{ old('phone') }}" name="phone"[m
+[31m-[m
+[31m-                                                    placeholder="enter phone number" maxlength="10" />[m
+[31m-[m
+[31m-                                                <!--<input type="tel" id="phone-code" class="form-control{{ $errors->has('phone') ? ' is-invalid' : '' }}" value="{{ old('phone') }}" placeholder="" name="phone" autocomplete="off">-->[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                            <input type="hidden" name="country_code" value="">[m
+[31m-[m
+[31m-                                        <!-- @endif -->[m
+[31m-[m
+[31m-                                        <div class="row">[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="password">{{ translate('Password') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="password"[m
+[31m-[m
+[31m-                                                        class="form-control @error('password') is-invalid @enderror"[m
+[31m-[m
+[31m-                                                        name="password" placeholder="********" aria-label="********"[m
+[31m-[m
+[31m-                                                        required>[m
+[31m-[m
+[31m-                                                    <small>{{ translate('Minimun 8 characters') }}</small>[m
+[31m-[m
+[31m-                                                    @error('password')[m
+[31m-[m
+[31m-                                                        <span class="invalid-feedback"[m
+[31m-[m
+[31m-                                                            role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                    @enderror[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                            <div class="col-lg-6">[m
+[31m-[m
+[31m-                                                <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                    <label class="form-label"[m
+[31m-[m
+[31m-                                                        for="password-confirm">{{ translate('Confirm password') }}</label>[m
+[31m-[m
+[31m-                                                    <input type="password" class="form-control"[m
+[31m-[m
+[31m-                                                        name="password_confirmation" placeholder="********" required>[m
+[31m-[m
+[31m-                                                    <small>{{ translate('Minimun 8 characters') }}</small>[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-                                        @if (addon_activation('referral_system'))[m
+[31m-[m
+[31m-                                            <div class="row">[m
+[31m-[m
+[31m-                                                <div class="col-lg-12">[m
+[31m-[m
+[31m-                                                    <div class="form-group mb-3">[m
+[31m-[m
+[31m-                                                        <label class="form-label"[m
+[31m-[m
+[31m-                                                            for="email">{{ translate('Referral Code') }}</label>[m
+[31m-[m
+[31m-                                                        <input type="text"[m
+[31m-[m
+[31m-                                                            class="form-control{{ $errors->has('referral_code') ? ' is-invalid' : '' }}"[m
+[31m-[m
+[31m-                                                            value="{{ old('referral_code') }}"[m
+[31m-[m
+[31m-                                                            placeholder="{{ translate('Referral Code') }}"[m
+[31m-[m
+[31m-                                                            name="referral_code">[m
+[31m-[m
+[31m-                                                        @if ($errors->has('referral_code'))[m
+[31m-[m
+[31m-                                                            <span class="invalid-feedback" role="alert">[m
+[31m-[m
+[31m-                                                                <strong>{{ $errors->first('referral_code') }}</strong>[m
+[31m-[m
+[31m-                                                            </span>[m
+[31m-[m
+[31m-                                                        @endif[m
+[31m-[m
+[31m-                                                    </div>[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        @endif[m
+[31m-[m
+[31m-                                        @if (get_setting('google_recaptcha_activation') == 1)[m
+[31m-[m
+[31m-                                            <div class="form-group">[m
+[31m-[m
+[31m-                                                <div class="g-recaptcha" data-sitekey="{{ env('CAPTCHA_KEY') }}"></div>[m
+[31m-[m
+[31m-                                                @error('g-recaptcha-response')[m
+[31m-[m
+[31m-                                                    <span class="invalid-feedback" role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                                @enderror[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        @endif[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                        <div class="mb-3">[m
+[31m-[m
+[31m-                                            <label class="aiz-checkbox">[m
+[31m-[m
+[31m-                                                <input type="checkbox" name="checkbox_example_1" required>[m
+[31m-[m
+[31m-                                                <span class=opacity-60>{{ translate('By signing up you agree to our') }}[m
+[31m-[m
+[31m-                                                    <a href="{{ env('APP_URL') . '/terms-conditions' }}"[m
+[31m-[m
+[31m-                                                        target="_blank">{{ translate('terms and conditions') }}.</a>[m
+[31m-[m
+[31m-                                                </span>[m
+[31m-[m
+[31m-                                                <span class="aiz-square-check"></span>[m
+[31m-[m
+[31m-                                            </label>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-                                        @error('checkbox_example_1')[m
+[31m-[m
+[31m-                                            <span class="invalid-feedback" role="alert">{{ $message }}</span>[m
+[31m-[m
+[31m-                                        @enderror[m
+[31m-[m
+[31m-[m
+[31m-[m
+[31m-                                        <div class="">[m
+[31m-[m
+[31m-                                            <button type="submit"[m
+[31m-[m
+[31m-                                                class="btn btn-block btn-primary">{{ translate('Create Account') }}</button>[m
+[31m-[m
+[31m-                                        </div>[m
+[31m-[m
+[31m-                                        @if (get_setting('google_login_activation') == 1 ||[m
+[31m-[m
+[31m-                                                get_setting('facebook_login_activation') == 1 ||[m
+[31m-[m
+[31m-                                                get_setting('twitter_login_activation') == 1 ||[m
+[31m-[m
+[31m-                                                get_setting('apple_login_activation') == 1)[m
+[31m-[m
+[31m-                                            <div class="mt-4">[m
+[31m-[m
+[31m-                                                <div class="separator mb-3">[m
+[31m-[m
+[31m-                                                    <span class="bg-white px-3">{{ translate('Or Join With') }}</span>[m
+[31m-[m
+[31m-                                                </div>[m
+[31m-[m
+[31m-                                                <ul class="list-inline social colored text-center">[m
+[31m-[m
+[31m-                                                    @if (get_setting('facebook_login_activation') == 1)[m
+[31m-[m
+[31m-                                                        <li class="list-inline-item">[m
+[31m-[m
+[31m-                                                            <a href="{{ route('social.login', ['provider' => 'facebook']) }}"[m
+[31m-[m
+[31m-                                                                class="facebook" title="{{ translate('Facebook') }}"><i[m
+[31m-[m
+[31m-                                                                    class="lab la-facebook-f"></i></a>[m
+[31m-[m
+[31m-                                                        </li>[m
+[31m-[m
+[31m-                                                    @endif[m
+[31m-[m
+[31m-                                                    @if (get_setting('google_login_activation') == 1)[m
+[31m-[m
+[31m-                                                        <li class="list-inline-item">[m
+[31m-[m
+[31m-                                                            <a href="{{ route('social.login', ['provider' => 'google']) }}"[m
+[31m-[m
+[31m-                                                                class="google" title="{{ translate('Google') }}"><i[m
+[31m-[m
+[31m-                                                                    class="lab la-google"></i></a>[m
+[31m-[m
+[31m-                                                        </li>[m
+[31m-[m
+[31m-                                                    @endif[m
+[31m-[m
+[31m-                                                    @if (get_setting('twitter_login_activation') == 1)[m
+[31m-[m
+[31m-                                                        <li class="list-inline-item">[m
+[31m-[m
+[31m-                                                            <a href="{{ route('social.login', ['provider' => 'twitter']) }}"[m
+[31m-[m
+[31m-                                                                class="twitter" title="{{ translate('Twitter') }}"><i[m
+[31m-[m
+[31m-                                                                    class="lab la-twitter"></i></a>[m
+[31m-[m
+[31m-                                                        </li>[m
+[31m-[m
+[31m-                                                    @endif[m
+[31m-[m
+[31m-                                                    @if (get_setting('apple_login_activation') == 1)[m
+[31m-[m
+[31m-                                                        <li class="list-inline-item">[m
+[31m-[m
+[31m-                                                            <a href="{{ route('social.login', ['provider' => 'apple']) }}"[m
+[31m-[m
+[31m-                                                                class="apple" title="{{ translate('Apple') }}"><i[m
+[31m-[m
+[31m-                                                                    class="lab la-apple"></i></a>[m
+[31m-[m
+[31m-                                                        </li>[m
+[31m-[m
+[31m-                                                    @endif[m
+[31m-[m
+[31m-                                                </ul>[m
+[31m-[m
+[31m-                                            </div>[m
+[31m-[m
+[31m-                                        @endif[m
+[31m-[m
+[31m-                                    </form>[m
+[31m-[m
+[31m-                                </div>[m
+[31m-[m
+[31m-                            </div>[m
+[31m-[m
+[31m-                        </div>[m
+[31m-[m
+[32m+[m[32m                        @include('frontend/register-form')[m
+                     @endif[m
+ [m
+                 </div>[m
+[1mdiff --git a/routes/web.php b/routes/web.php[m
+[1mindex 7697abf..eea4485 100644[m
+[1m--- a/routes/web.php[m
+[1m+++ b/routes/web.php[m
+[36m@@ -32,7 +32,7 @@[m [mRoute::controller(DemoController::class)->group(function () {[m
+ Auth::routes();[m
+ [m
+ //Home Page[m
+[31m-Route::get('/', 'HomeController@index')->name('index');[m
+[32m+[m[32m// Route::get('/', 'HomeController@index')->name('index');[m
+ Route::get('/', 'HomeController@index')->name('home');[m
+ [m
+ // fcm[m
+[36m@@ -101,7 +101,7 @@[m [mRoute::group(['middleware' => ['member', 'verified']], function () {[m
+     Route::get('/dashboard', 'HomeController@dashboard')->name('dashboard');[m
+ [m
+     Route::get('/profile-settings', 'MemberController@profile_settings')->name('profile_settings');[m
+[31m-    [m
+[32m+[m
+     Route::get('/package-payment-methods/{id}', 'PackageController@package_payemnt_methods')->name('package_payment_methods');[m
+     Route::post('/package-payment', 'PackagePaymentController@store')->name('package.payment');[m
+ [m
+[36m@@ -145,7 +145,7 @@[m [mRoute::group(['middleware' => ['member', 'verified']], function () {[m
+     Route::post('/member/add-to-ignore-list', 'IgnoredUserController@add_to_ignore_list')->name('member.add_to_ignore_list');[m
+     Route::post('/member/remove-from-ignored-list', 'IgnoredUserController@remove_from_ignored_list')->name('member.remove_from_ignored_list');[m
+ [m
+[31m-    // Profile_picture view request [m
+[32m+[m[32m    // Profile_picture view request[m
+     Route::resource('/profile-picture-view-request', 'ViewProfilePictureController');[m
+     Route::post('/profile-picture-view-request/accept', 'ViewProfilePictureController@accept_request')->name('profile_picture_view_request_accept');[m
+     Route::post('/profile-picture-view-request/reject', 'ViewProfilePictureController@reject_request')->name('profile_picture_view_request_reject');[m
+[36m@@ -178,12 +178,12 @@[m [mRoute::group(['middleware' => ['auth']], function () {[m
+     Route::post('/members/introduction_update/{id}', 'MemberController@introduction_update')->name('member.introduction.update');[m
+     Route::post('/members/basic_info_update/{id}', 'MemberController@basic_info_update')->name('member.basic_info_update');[m
+     Route::post('/members/language_info_update/{id}', 'MemberController@language_info_update')->name('member.language_info_update');[m
+[31m-    [m
+[32m+[m
+     //Member heightest education and education detail update[m
+     Route::post('/member/heightest_education/{id}', 'MemberController@heighest_eduction_update')->name('member.heightest_education.update');[m
+     //Member employeed in and profession[m
+     Route::post('/member/emplyeed_profession/{id}', 'MemberController@emplyeed_profession_update')->name('member.emplyeed_profession.update');[m
+[31m-    [m
+[32m+[m
+     Route::resource('/address', 'AddressController');[m
+ [m
+     // Member education[m
+[36m@@ -192,7 +192,7 @@[m [mRoute::group(['middleware' => ['auth']], function () {[m
+     Route::post('/education/edit', 'EducationController@edit')->name('education.edit');[m
+     Route::post('/education/update_education_present_status', 'EducationController@update_education_present_status')->name('education.update_education_present_status');[m
+     Route::get('/education/destroy/{id}', 'EducationController@destroy')->name('education.destroy');[m
+[31m-    [m
+[32m+[m
+ [m
+     // Member Career[m
+     Route::resource('/career', 'CareerController');[m
+[36m@@ -200,7 +200,7 @@[m [mRoute::group(['middleware' => ['auth']], function () {[m
+     Route::post('/career/edit', 'CareerController@edit')->name('career.edit');[m
+     Route::post('/career/update_career_present_status', 'CareerController@update_career_present_status')->name('career.update_career_present_status');[m
+     Route::get('/career/destroy/{id}', 'CareerController@destroy')->name('career.destroy');[m
+[31m-    [m
+[32m+[m
+     // Member Family Information[m
+     Route::resource('/family_information', 'FamilyController');[m
+     Route::post('/family_information/create', 'FamilyController@create')->name('family_information.create');[m
+[36m@@ -218,7 +218,7 @@[m [mRoute::group(['middleware' => ['auth']], function () {[m
+     Route::resource('/spiritual_backgrounds', 'SpiritualBackgroundController');[m
+     Route::resource('/partner_expectations', 'PartnerExpectationController');[m
+ [m
+[31m-    [m
+[32m+[m
+     Route::post('/states/get_state_by_country', 'StateController@get_state_by_country')->name('states.get_state_by_country');[m
+     Route::post('/cities/get_cities_by_state', 'CityController@get_cities_by_state')->name('cities.get_cities_by_state');[m
+     Route::post('/castes/get_caste_by_religion', 'CasteController@get_caste_by_religion')->name('castes.get_caste_by_religion');[m
+[36m@@ -231,7 +231,7 @@[m [mRoute::group(['middleware' => ['auth']], function () {[m
+ [m
+     // get Profession[m
+     Route::post('/get-professions', 'MemberController@get_professions')->name('get-professions');[m
+[31m-    [m
+[32m+[m
+ });[m
+ [m
+ // Contact Us page[m

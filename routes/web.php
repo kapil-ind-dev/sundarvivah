@@ -32,7 +32,7 @@ Route::controller(DemoController::class)->group(function () {
 Auth::routes();
 
 //Home Page
-Route::get('/', 'HomeController@index')->name('index');
+// Route::get('/', 'HomeController@index')->name('index');
 Route::get('/', 'HomeController@index')->name('home');
 
 // fcm
@@ -101,7 +101,7 @@ Route::group(['middleware' => ['member', 'verified']], function () {
     Route::get('/dashboard', 'HomeController@dashboard')->name('dashboard');
 
     Route::get('/profile-settings', 'MemberController@profile_settings')->name('profile_settings');
-    
+
     Route::get('/package-payment-methods/{id}', 'PackageController@package_payemnt_methods')->name('package_payment_methods');
     Route::post('/package-payment', 'PackagePaymentController@store')->name('package.payment');
 
@@ -145,7 +145,7 @@ Route::group(['middleware' => ['member', 'verified']], function () {
     Route::post('/member/add-to-ignore-list', 'IgnoredUserController@add_to_ignore_list')->name('member.add_to_ignore_list');
     Route::post('/member/remove-from-ignored-list', 'IgnoredUserController@remove_from_ignored_list')->name('member.remove_from_ignored_list');
 
-    // Profile_picture view request 
+    // Profile_picture view request
     Route::resource('/profile-picture-view-request', 'ViewProfilePictureController');
     Route::post('/profile-picture-view-request/accept', 'ViewProfilePictureController@accept_request')->name('profile_picture_view_request_accept');
     Route::post('/profile-picture-view-request/reject', 'ViewProfilePictureController@reject_request')->name('profile_picture_view_request_reject');
@@ -178,12 +178,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/members/introduction_update/{id}', 'MemberController@introduction_update')->name('member.introduction.update');
     Route::post('/members/basic_info_update/{id}', 'MemberController@basic_info_update')->name('member.basic_info_update');
     Route::post('/members/language_info_update/{id}', 'MemberController@language_info_update')->name('member.language_info_update');
-    
+
     //Member heightest education and education detail update
     Route::post('/member/heightest_education/{id}', 'MemberController@heighest_eduction_update')->name('member.heightest_education.update');
     //Member employeed in and profession
     Route::post('/member/emplyeed_profession/{id}', 'MemberController@emplyeed_profession_update')->name('member.emplyeed_profession.update');
-    
+
     Route::resource('/address', 'AddressController');
 
     // Member education
@@ -192,7 +192,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/education/edit', 'EducationController@edit')->name('education.edit');
     Route::post('/education/update_education_present_status', 'EducationController@update_education_present_status')->name('education.update_education_present_status');
     Route::get('/education/destroy/{id}', 'EducationController@destroy')->name('education.destroy');
-    
+
 
     // Member Career
     Route::resource('/career', 'CareerController');
@@ -200,7 +200,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/career/edit', 'CareerController@edit')->name('career.edit');
     Route::post('/career/update_career_present_status', 'CareerController@update_career_present_status')->name('career.update_career_present_status');
     Route::get('/career/destroy/{id}', 'CareerController@destroy')->name('career.destroy');
-    
+
     // Member Family Information
     Route::resource('/family_information', 'FamilyController');
     Route::post('/family_information/create', 'FamilyController@create')->name('family_information.create');
@@ -218,7 +218,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('/spiritual_backgrounds', 'SpiritualBackgroundController');
     Route::resource('/partner_expectations', 'PartnerExpectationController');
 
-    
+
     Route::post('/states/get_state_by_country', 'StateController@get_state_by_country')->name('states.get_state_by_country');
     Route::post('/cities/get_cities_by_state', 'CityController@get_cities_by_state')->name('cities.get_cities_by_state');
     Route::post('/castes/get_caste_by_religion', 'CasteController@get_caste_by_religion')->name('castes.get_caste_by_religion');
@@ -231,7 +231,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // get Profession
     Route::post('/get-professions', 'MemberController@get_professions')->name('get-professions');
-    
+
 });
 
 // Contact Us page
